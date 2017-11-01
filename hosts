@@ -1,0 +1,15 @@
+[allservers]
+localhost
+web1
+web2
+db1
+
+[web]
+web1
+web2
+
+[db]
+db1
+
+[misc]
+playbooks
