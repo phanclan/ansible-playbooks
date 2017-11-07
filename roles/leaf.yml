@@ -1,0 +1,18 @@
+---
+- name: Configure leaf.
+  hosts: leaf
+  gather_facts: no
+  connection: local
+
+  roles:
+    - common
+    - interfaces
+    - bridging
+    - ipv4
+    - bgp
+
+# common role: This role is used to configure the IP routing table on the Spine
+# interfaces role: This role is used to configure interfaces on the Spine
+# bridging role: This role is used to configure all necessary VLANs and switch ports on the Spine
+# ipv4 role: This role is used to configure the Spine's IP interfaces
+# bgp role: This role is used to configure BGP protocol to allow the switches to be meshed together

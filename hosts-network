@@ -1,0 +1,5 @@
+[spine]
+spineswitch01
+
+[leaf]
+leafswitch01 net_host=172.16.1.89

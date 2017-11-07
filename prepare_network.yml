@@ -1,0 +1,27 @@
+---
+- hosts: spine
+  gather_facts: no
+  connection: local
+  tasks:
+  - name: Obtain credentials
+    include_vars: secrets.yaml
+
+  - name: Define provider
+    set_fact:
+      provider:
+        host: "{{ inventory_hostname }}"
+        username: "{{ creds['username'] }}"
+        password: "{{ creds['password'] }}"
+        #authorize: true
+        auth_pass: "{{ creds['auth_pass'] }}"
+  - name: Show version
+    ios_command:
+      provider: "{{ provider }}"
+      commands:
+        - show version
+    register: version
+
+    #- debug: var=version.stdout_lines
+
+      #backup: true
+      #save: true

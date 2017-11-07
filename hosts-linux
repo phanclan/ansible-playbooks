@@ -1,7 +1,7 @@
+localhost ansible_connection=local
+
 [allservers]
-localhost
-web1
-web2
+web[1:2]
 db1
 
 [webservers]

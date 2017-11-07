@@ -1,0 +1,25 @@
+---
+- name: Configure spine.
+  include_vars: ./roles/{{items}}.yml
+  with_items:
+    - common
+    - interfaces
+    - bridging
+    - ipv4
+    - bgp
+  hosts: spine
+  gather_facts: no
+  connection: local
+
+  roles:
+    - common
+    - interfaces
+    - bridging
+    - ipv4
+    - bgp
+
+# common role: This role is used to configure the IP routing table
+# interfaces role: This role is used to configure interfaces
+# bridging role: This role is used to configure all necessary VLANs and switch ports
+# ipv4 role: This role is used to configure the Devices's IP interfaces
+# bgp role: This role is used to configure BGP protocol to allow the switches to be meshed together
