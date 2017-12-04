@@ -1,0 +1,14 @@
+---
+- name: GENERATE ROUTER CONFIG FILES
+  hosts: all
+  gather_facts: no
+  connection: local
+  vars:
+    provider:
+      host: "{{ inventory_hostname }}"
+      username: "{{ creds['username'] }}"
+      password: "{{ creds['password'] }}"
+      #authorize: true
+      auth_pass: "{{ creds['auth_pass'] }}"
+  roles:
+    - router

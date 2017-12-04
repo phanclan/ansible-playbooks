@@ -1,0 +1,4 @@
+{% for ro_community in snmp.ro %}
+snmp-server community {{ ro_community }} RO
+{% endfor %}
+snmp-server contact Peter Phan 3

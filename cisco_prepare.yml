@@ -1,0 +1,109 @@
+---
+- hosts: allswitches
+  gather_facts: no
+  connection: local
+  vars:
+    provider:
+      host: "{{ inventory_hostname }}"
+      username: "{{ creds['username'] }}"
+      password: "{{ creds['password'] }}"
+      #authorize: true
+      auth_pass: "{{ creds['auth_pass'] }}"
+    snmp:
+      ro:
+        - public
+        - public2
+
+  tasks:
+  - name: Obtain credentials
+    include_vars: secrets.yaml
+    tags: main
+
+  #- name: Define provider
+
+  - name: Run 'show version'
+    ios_command:
+      provider: "{{ provider }}"
+      commands:
+        - show version
+      #wait_for: result[0] contains IOS
+    register: version
+
+  - debug: var=version.stdout_lines
+
+  - name: Run 'show run interface g0/0'
+    ios_command:
+      provider: "{{ provider }}"
+      commands: 'show run int g0/0'
+    register: intf_oob
+    tags: si
+
+  - debug: var=intf_oob.stdout_lines
+    tags: si
+
+  - name: configure interface settings
+    ios_config:
+      provider: "{{ provider }}"
+      lines:
+        - description OOB Management for Ansible
+        #- ip address 172.31.1.1 255.255.255.0
+      parents: interface GigabitEthernet0/0
+
+  - name: DEPLOY SNMP VIA CONFIG FILE
+    ios_config:
+      provider: "{{ provider }}"
+      src: ./files/snmp.cfg
+
+  - name: DEPLOY SNMP VIA JINJA2 TEMPLATES
+    ios_config:
+      provider: "{{ provider }}"
+      src: ./templates/snmp.j2
+
+  - name: GENERATE SNMP CONFIG FILE
+    template: src=./templates/snmp.j2 dest=./files/snmp-auto-{{inventory_hostname}}.cfg
+    tags: snmp
+
+  - name: DEPLOY SNMP VIA AUTO GENERATED CONFIG FILE
+    ios_config:
+      provider: "{{ provider }}"
+      src: ./files/snmp-auto.cfg
+    tags: snmp
+
+  - name: Configure service
+    ios_config:
+      provider: "{{ provider }}"
+      lines:
+        - no service pad
+        - service timestamps debug uptime
+        - service timestamps log uptime
+        - service password-encryption
+
+  - name: Run 'show access-list TEST'
+    ios_command:
+      provider: "{{ provider }}"
+      commands: 'show access-list TEST'
+    register: before_acl
+
+  - debug: var=before_acl.stdout_lines
+
+  - name: Create an access list.
+    ios_config:
+      provider: "{{ provider }}"
+      parents: 'ip access-list extended TEST'
+      lines:
+        - 10 permit tcp any any eq www
+        - 20 permit ip host 1.1.1.1 any
+      before: 'no ip access-list extended TEST'
+      match: exact
+      replace: block
+
+  - name: Run 'show access-list TEST'
+    ios_command:
+      provider: "{{ provider }}"
+      commands: 'show access-list TEST'
+    register: after_acl
+
+  - debug: var=after_acl.stdout_lines
+
+      #backup: true
+      #save: true

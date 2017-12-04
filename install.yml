@@ -1,0 +1,7 @@
+---
+- name: deploy vsftpd
+  hosts: rt01
+  tasks:
+  - name: install vsftpd
+    apt: name=vsftpd
+
