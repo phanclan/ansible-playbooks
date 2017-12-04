@@ -3,6 +3,7 @@ localhost ansible_connection=local
 [allservers]
 web[1:2]
 db1
+rt01
 
 [webservers]
 web1
